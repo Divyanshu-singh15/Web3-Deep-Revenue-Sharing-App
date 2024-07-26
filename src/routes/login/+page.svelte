@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { auth } from '$lib/stores/auth';
+    // import { auth } from '$lib/stores/auth';
 
   
     let email = '';
@@ -21,7 +21,7 @@
           const data = await response.json();
           console.log('Login successful:', data);
           document.cookie = `auth_token=${data.token}; path=/; max-age=3600; secure; samesite=strict`;
-          auth.login({ id: data.userId });
+          // auth.login({ id: data.userId });
           // Handle successful login (e.g., redirect to dashboard)
           goto('/dashboard');
         } else {

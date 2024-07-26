@@ -15,6 +15,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   if (event.url.pathname.startsWith('/dashboard') && !event.locals.user) {
     return new Response('Redirect', { status: 303, headers: { Location: '/login' } });
   }
+
   console.log("still logged in")
   return await resolve(event);
 };

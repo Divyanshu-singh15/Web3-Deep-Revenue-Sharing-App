@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { auth } from '$lib/stores/auth';
+  // import { auth } from '$lib/stores/auth';
   import { onMount } from 'svelte';
 
   export let data;
@@ -12,6 +12,20 @@
 
   const switchSection = (section: string) => {
     activeSection = section;
+  };
+
+  const updateBusinessData = async () => {
+    try {
+      const response = await fetch('/api/getBusinessData');
+      if (response.ok) {
+        const newData = await response.json();
+        data.businessData = newData; // Update the business data
+      } else {
+        console.error('Failed to fetch business data.');
+      }
+    } catch (error) {
+      console.error('Error fetching business data:', error);
+    }
   };
 
   const registerBusiness = async () => {
@@ -36,6 +50,7 @@
     businessType = '';
     contactAddress = '';
     phoneNumber = '';
+    updateBusinessData();
     switchSection('salespersonDashboard'); // Switch to another section if desired
   } else {
     alert('Failed to register business.');
@@ -44,7 +59,7 @@
 
 </script>
 
-{#if $auth.isAuthenticated}
+<!-- {#if $auth.isAuthenticated} -->
 <div class="min-h-screen bg-gray-100 p-4">
   <div class="max-w-7xl mx-auto">
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -150,6 +165,6 @@
   </div>
 </div>
 <p>User data: {JSON.stringify(data.userData)}</p>
-{:else}
+<!-- {:else}
 <p>Please log in to view this page.</p>
-{/if}
+{/if} -->

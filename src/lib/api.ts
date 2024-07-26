@@ -19,6 +19,7 @@ export async function fetchUserData(userId: number) {
 
 
 export async function fetchBusinessData(userId: number) {
+  
   const business = await prisma.business.findMany({
     where: { userId: userId},
     select: {

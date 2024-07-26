@@ -32,3 +32,5 @@ model Business {
   userId  Int     // Foreign key to User
   user    User    @relation(fields: [userId], references: [id])
 }
+
+
