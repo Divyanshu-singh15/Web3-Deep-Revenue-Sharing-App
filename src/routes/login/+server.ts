@@ -22,7 +22,7 @@ export async function POST({ request }: RequestEvent) {
 
     if (user && await bcrypt.compare(password, user.password)) {
       const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-      return json({ token, userId: user.id });
+      return json({ token});
       // return json({ message: 'Login successful' }, { status: 200 });
     } else {
       // Invalid credentials

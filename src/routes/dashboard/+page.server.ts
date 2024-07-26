@@ -1,7 +1,7 @@
 // src/routes/dashboard/+page.server.ts
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
-import { fetchUserData, fetchBusinessData } from '$lib/api'; // Implement this function to fetch user data
+import { fetchUserData, fetchBusinessData, fetchAllBusinessData } from '$lib/api'; // Implement this function to fetch user data
 
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -12,11 +12,14 @@ export const load: PageServerLoad = async ({ locals }) => {
   
   // Fetch user-specific data
   const userData = await fetchUserData(locals.user.userId);
-  console.log("hehehehehehehe");
+
   const businessData = await fetchBusinessData(locals.user.userId)
+
+  const allBusinessData = await fetchAllBusinessData()
 
   return {
     userData,
-    businessData
+    businessData,
+    allBusinessData
   };
 };

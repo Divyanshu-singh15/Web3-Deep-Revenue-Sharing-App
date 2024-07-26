@@ -9,7 +9,7 @@
   
     async function handleSubmit() {
       try {
-        const response = await fetch('/api/login', {
+        const response = await fetch('/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -19,10 +19,7 @@
   
         if (response.ok) {
           const data = await response.json();
-          console.log('Login successful:', data);
           document.cookie = `auth_token=${data.token}; path=/; max-age=3600; secure; samesite=strict`;
-          // auth.login({ id: data.userId });
-          // Handle successful login (e.g., redirect to dashboard)
           goto('/dashboard');
         } else {
           const errorData = await response.json();

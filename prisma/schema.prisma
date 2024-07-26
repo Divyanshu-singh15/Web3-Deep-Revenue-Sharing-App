@@ -20,6 +20,7 @@ model User {
   email String  @unique
   password String
   businesses Business[] // One-to-many relationship with Business
+  product Product[]
 }
 
 
@@ -29,6 +30,19 @@ model Business {
   address String
   phone   String
   type    String
+  userId  Int     // Foreign key to User
+  user    User    @relation(fields: [userId], references: [id])
+  product Product[]
+}
+
+
+model Product {
+  id      Int     @id @default(autoincrement())
+  name    String
+  description String
+  price   Int
+  businessId    Int
+  business Business @relation(fields: [businessId], references: [id])
   userId  Int     // Foreign key to User
   user    User    @relation(fields: [userId], references: [id])
 }

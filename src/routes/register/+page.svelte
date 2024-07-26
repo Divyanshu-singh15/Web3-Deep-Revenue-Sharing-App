@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
   
     let username = '';
@@ -7,7 +8,7 @@
   
     async function handleSubmit() {
       try {
-        const response = await fetch('/api/register', {
+        const response = await fetch('/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -17,10 +18,12 @@
   
         if (response.ok) {
           const data = await response.json();
-          console.log('Registration successful:', data);
+          alert('Registration successful');
+          goto("/login")
           // Handle successful registration (e.g., redirect to login or show a success message)
         } else {
           const errorData = await response.json();
+          alert("This email is alredy registered!")
           console.error('Registration failed:', errorData.error);
           // Handle registration failure (e.g., show an error message)
         }
