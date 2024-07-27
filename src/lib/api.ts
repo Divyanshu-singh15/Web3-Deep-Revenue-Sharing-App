@@ -91,3 +91,18 @@ export async function fetchProductsData(userId: number, businessId: number) {
 
 
 
+export async function fetchAllProductsData() {
+
+  const business = await prisma.product.findMany({
+    where: {},
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      businessId: true,
+      // Add other fields you want to return, but exclude sensitive information like passwords
+    }
+  });
+
+  return business;
+}
