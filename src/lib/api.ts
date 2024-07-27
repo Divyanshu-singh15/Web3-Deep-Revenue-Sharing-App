@@ -10,6 +10,7 @@ export async function fetchUserData(userId: number) {
       id: true,
       name: true,
       email: true,
+      paymailAddress: true
       // Add other fields you want to return, but exclude sensitive information like passwords
     }
   });
@@ -116,6 +117,8 @@ export async function fetchUniqueProductData(id: number) {
       name: true,
       price: true,
       description: true,
+      userId: true,
+      referalAmount: true
       // Add other fields you want to return, but exclude sensitive information like passwords
     }
   });

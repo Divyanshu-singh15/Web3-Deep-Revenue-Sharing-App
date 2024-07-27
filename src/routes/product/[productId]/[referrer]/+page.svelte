@@ -1,15 +1,39 @@
 <script lang="ts">
+
     export let data: any;
-    let name: string;
-    let phone: string;
-    let password: string;
-    let wallet: string;
-    let address: string;
+    let name: string = '';
+    let phone: string = '';
+    let password: string = '';
+    let wallet: string = '';
+    let address: string = '';
+
+    
 
     // Placeholder for form submission handler
-    function handleSubmit() {
-        // Handle form submission
+    async function handleSubmit(): Promise<void> {
+      try {
+        const response = await fetch('/product', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, phone: phone.toString(), wallet, address, password,  productId: data.productData.id, referrerId: data.referrer  })
+        });
+  
+        if (response.ok) {
+          const responseData = await response.json();
+          alert("Purchase Successful");
+        } else {
+          const errorData = await response.json();
+          const errorMessage = errorData.error || 'An error occurred during purchase';
+          alert(errorMessage);
+        }
+      } catch (error) {
+        console.error('Error during purchase:', error);
+        alert('An error occurred during the purchase');
+      }
     }
+
 </script>
 
 <!-- Main Container -->
@@ -64,7 +88,7 @@
                     <input 
                         id="wallet"
                         type="text" 
-                        placeholder="Enter your wallet" 
+                        placeholder="Enter your wallet (mywallet@dev.neucron.io)" 
                         bind:value={wallet} 
                         class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-blue-500 transition duration-300"
                         required

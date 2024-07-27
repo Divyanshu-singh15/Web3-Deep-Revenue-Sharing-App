@@ -60,3 +60,46 @@ export async function POST({ request }: RequestEvent) {
     return json({ error: 'Failed to register business' }, { status: 500 });
   }
 }
+
+
+
+export const PATCH: RequestHandler = async ({ request, locals }) => {
+  try {
+    const { name, email, paymailAddress } = await request.json();
+
+    if (!name || !email || !paymailAddress || !locals.user) {
+      return new Response(JSON.stringify({ success: false, message: 'All fields are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Update the user in the database
+    const updateresponse = await prisma.user.update({
+      where: { id: locals.user.userId },
+      data: { 
+        name, 
+        email,
+        paymailAddress 
+      },
+    });
+
+    const response = {
+      success: true,
+      message: 'Profile updated successfully',
+      updateresponse,
+    };
+
+    return new Response(JSON.stringify(response), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return new Response(JSON.stringify({ success: false, message: 'Failed to update profile' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+};
+
+

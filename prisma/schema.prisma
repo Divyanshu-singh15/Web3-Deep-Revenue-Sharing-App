@@ -19,6 +19,7 @@ model User {
   name  String
   email String  @unique
   password String
+  paymailAddress String?
   businesses Business[] // One-to-many relationship with Business
   product Product[]
 }
@@ -41,6 +42,7 @@ model Product {
   name    String
   description String
   price   Int
+  referalAmount Int?
   businessId    Int
   business Business @relation(fields: [businessId], references: [id])
   userId  Int     // Foreign key to User
@@ -54,6 +56,7 @@ model Purchase {
   phone String
   address String
   productId Int
+  referrerId Int?
   product Product @relation(fields: [productId], references: [id])
 }
 

@@ -1,20 +1,9 @@
 import type { PageServerLoad } from './$types';
-import {fetchUniqueProductData} from  '$lib/api'
+import { redirect } from '@sveltejs/kit';
 
 
-export const load: PageServerLoad = async ({ params }) => {
-    const id = parseInt(params.productId, 10);
-    if (isNaN(id)) {
-        // Handle invalid ID case
-        return { status: 404, error: new Error('Product not found') };
-      }
-      
-      const productData = await fetchUniqueProductData(id);
-      console.log("ring",productData)
-      if (!productData) {
-        return { status: 404, error: new Error('Product not found') };
-      }
-    return {
-        productData
-    };
-}
+export const load: PageServerLoad = async ({ locals, params }) => {
+      throw redirect(303, `/product/${params.productId}/item`);
+    return {};
+  };
+  

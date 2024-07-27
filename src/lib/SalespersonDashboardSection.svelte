@@ -1,6 +1,15 @@
 <script lang="ts">
   export let data: any;
 
+  import { browser } from '$app/environment';
+  import { onMount } from 'svelte';
+
+  let baseUrl = '';
+
+  onMount(() => {
+    baseUrl = window.location.origin;
+  });
+
   // State to track the expanded business
   let expandedBusinessId: number | null = null;
 
@@ -8,11 +17,20 @@
   function toggleExpansion(businessId: number) {
     expandedBusinessId = expandedBusinessId === businessId ? null : businessId;
   }
-
+  console.log("bing",data.allProductsData)
   // Method to get products for a specific business
   function getProductsForBusiness(businessId: number) {
     return data.allProductsData.filter((product: { businessId: number; }) => product.businessId === businessId);
   }
+
+  const copyLink = (productId: number, userId: number ) => {
+    const link = `${baseUrl}/product/${productId}/${userId}`;
+    navigator.clipboard.writeText(link).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  };
 </script>
 
 <div>
@@ -20,6 +38,10 @@
   
   <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      {#if data.userData?.paymailAddress === null}
+        <p class="p-4 text-red-500">Kindly set your paymail Id in your profile first so that you recieve the reward</p>
+      {/if}
+      <p></p>
       <table class="w-full">
         <thead>
           <tr class="bg-gray-100">
@@ -50,6 +72,9 @@
                     <div class="flex justify-between">
                       <span>{product.name}</span>
                       <span>${product.price}</span>
+                      <button on:click={()=>copyLink(product.id, data.userData.id)} class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Copy referel Link
+                      </button>
                     </div>
                   </td>
                 </tr>
