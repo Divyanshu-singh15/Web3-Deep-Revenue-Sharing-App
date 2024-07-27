@@ -104,6 +104,7 @@
         <h2 class="text-lg font-semibold">{product.name}</h2>
         <p class="text-gray-600">{product.description}</p>
         <p class="text-gray-900 font-bold">${product.price.toFixed(2)}</p>
+        <a href="/product/{product.id}">view</a>
       </div>
     {/each}
   </div>

@@ -45,6 +45,16 @@ model Product {
   business Business @relation(fields: [businessId], references: [id])
   userId  Int     // Foreign key to User
   user    User    @relation(fields: [userId], references: [id])
+  purchases Purchase[]
+}
+
+model Purchase {
+  id      Int     @id @default(autoincrement())
+  name String
+  phone String
+  address String
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
 }
 
 

@@ -1,5 +1,5 @@
 // src/lib/api.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, type Product } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -105,4 +105,20 @@ export async function fetchAllProductsData() {
   });
 
   return business;
+}
+
+
+export async function fetchUniqueProductData(id: number) {
+  const product = await prisma.product.findUnique({
+    where: { id: id },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      description: true,
+      // Add other fields you want to return, but exclude sensitive information like passwords
+    }
+  });
+
+  return product;
 }

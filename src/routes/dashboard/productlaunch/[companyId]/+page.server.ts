@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
     throw error(404, `No such business exist`);
   }
   const productsData = await fetchProductsData(locals.user.userId, companyId);
-
+  
   return {
     companyId,
     productsData
