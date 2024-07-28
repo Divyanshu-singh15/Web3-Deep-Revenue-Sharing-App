@@ -92,7 +92,7 @@
 </style>
 
 <div class="top-bar">
-  Sales Tracking Dashboard
+   Homepage 
 </div>
 
 <section>
@@ -101,8 +101,8 @@
           <span>Welcome to the</span>
           <span>{message}</span>
       </div>
-      <h1 class="heading">Your Friendly Sales Tracking Application</h1>
-      <p class="sub-heading">Track your sales effortlessly with our intuitive dashboard.</p>
+      <h1 class="heading">Your Friendly Deep Revenue Sharing Application</h1>
+      <p style="border-left-color: black;" class="sub-heading">Track your sales effortlessly with our intuitive dashboard.</p>
   </div>
   <div class="cards">
       <div class="card">
@@ -117,5 +117,9 @@
           <h2>Customer Analytics</h2>
           <p>Understand your customers better with comprehensive analytics.</p>
       </div>
+      <div class="card">
+        <h2>Easy for Salespeople to Use</h2>
+        <p>Gain insights into your salespeople's performance.</p>
+    </div>
   </div>
 </section>
