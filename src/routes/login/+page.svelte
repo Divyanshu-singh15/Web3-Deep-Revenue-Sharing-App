@@ -32,7 +32,7 @@
 </script>
 
 <Navbar />
-<div class="message-bar">Deep Revenue Sharing</div>
+<div class="message-bar">Login</div>
 
 <div class="login-container">
   <div class="content">
