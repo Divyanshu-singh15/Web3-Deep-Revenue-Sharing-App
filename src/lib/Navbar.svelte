@@ -42,6 +42,7 @@
         <li>
           <a href="/contact" class="block py-2 px-3 text-gray-900 dark:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-700 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:md:hover:text-blue-500 md:p-0">Contact us</a>
         </li>
+        
       </ul>
     </div>
   </div>

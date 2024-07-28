@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import Fotter from "$lib/Fotter.svelte";
   import Navbar from "$lib/Navbar.svelte";
 
   let email = '';
