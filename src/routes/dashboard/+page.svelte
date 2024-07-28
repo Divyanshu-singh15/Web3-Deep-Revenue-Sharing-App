@@ -69,7 +69,6 @@
       contactAddress = '';
       phoneNumber = '';
       getBusinessData();
-      switchSection('salespersonDashboard');
     } else {
       alert('Failed to register business.');
     }
