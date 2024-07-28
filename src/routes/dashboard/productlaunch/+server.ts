@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 export async function POST({ request, locals }: RequestEvent) {
   try {
-    const { name, description, price, companyId} = await request.json();
+    const { name, description, price, companyId, referalAmount} = await request.json();
     
-    if (!name || !description || !price || !companyId || !locals.user?.userId) {
+    if (!name || !description || !price || !companyId || !locals.user?.userId || !referalAmount || referalAmount <= 0) {
       return json({ error: 'All fields are required' }, { status: 400 });
     }
 
@@ -18,6 +18,7 @@ export async function POST({ request, locals }: RequestEvent) {
         price: parseInt(price),
         businessId: companyId,
         userId: locals.user.userId,
+        referalAmount: referalAmount ? parseInt(referalAmount) : 0,
       },
     });
 

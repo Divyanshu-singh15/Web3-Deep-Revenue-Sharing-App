@@ -27,5 +27,5 @@
   </script>
   
   
-  <Header {logout}/>
+  <Header />
   <slot />

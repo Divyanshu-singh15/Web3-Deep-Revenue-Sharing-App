@@ -4,6 +4,28 @@
   import SalespersonDashboardSection from '$lib/SalespersonDashboardSection.svelte';
   import { goto } from '$app/navigation';
 
+  async function logout() {
+  try {
+    console.log('Sending POST request to /logout');
+    const response = await fetch('/logout', {
+      method: 'POST'
+    });
+
+    if (response.ok) {
+      console.log('POST request successful, clearing cookie and redirecting');
+      // Clear the auth_token cookie on the client side
+      document.cookie = 'auth_token=; path=/; max-age=0; secure; samesite=strict';
+
+      // Redirect to login page after logout
+      await goto('/login');
+    } else {
+      console.error('Logout failed:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error during logout:', error);
+  }
+}
+
   export let data;
   console.log("divt",data);
   let activeSection = 'businessRegistration';
@@ -87,6 +109,12 @@
       <!-- Header -->
       <div class="bg-gray-800 text-white p-4 flex justify-between">
         <h1 class="text-2xl">Dashboard</h1>
+        <button
+        class="text-gray-300 hover:text-white transition duration-300"
+        on:click={logout}
+      >
+        Logout
+      </button>
       </div>
       
       <!-- Section Buttons -->

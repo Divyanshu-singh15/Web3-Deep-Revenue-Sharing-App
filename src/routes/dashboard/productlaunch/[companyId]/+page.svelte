@@ -4,6 +4,7 @@
   let name: string = '';
   let description: string = '';
   let price: number = 0;
+  let referalAmount = 0;
 
   export let data;
 
@@ -20,7 +21,8 @@
         name,
         description,
         price,
-        companyId: data.companyId
+        companyId: data.companyId,
+        referalAmount: referalAmount
       };
 
       const response = await fetch('/dashboard/productlaunch', {
@@ -39,6 +41,7 @@
         name = '';
         description = '';
         price = 0;
+        referalAmount = 0;
       } else {
         const errorData = await response.json();
         alert(`Failed to create product: ${errorData.error}`);
@@ -84,6 +87,17 @@
         type="number"
         id="price"
         bind:value={price}
+        step="0.01"
+        required
+        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      />
+    </div>
+    <div>
+      <label for="referalamount" class="block text-sm font-medium text-gray-700">Referal Amount:</label>
+      <input
+        type="number"
+        id="referalAmount"
+        bind:value={referalAmount}
         step="0.01"
         required
         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
