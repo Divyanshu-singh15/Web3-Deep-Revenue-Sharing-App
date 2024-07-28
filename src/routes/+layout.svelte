@@ -1,6 +1,8 @@
 <script>
     import "../app.css";
-    import Header from "$lib/Header.svelte"
+    import Fotter from "$lib/Fotter.svelte";
+    import Navbar from "$lib/Navbar.svelte";
+    import "../app.css"
 	import { goto } from "$app/navigation";
 
   async function logout() {
@@ -27,5 +29,5 @@
   </script>
   
   
-  <Header />
+  <Navbar />
   <slot />
