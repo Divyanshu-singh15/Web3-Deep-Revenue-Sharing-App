@@ -4,42 +4,37 @@
   import SalespersonDashboardSection from '$lib/SalespersonDashboardSection.svelte';
   import { goto } from '$app/navigation';
 
-  async function logout() {
-  try {
-    console.log('Sending POST request to /logout');
-    const response = await fetch('/logout', {
-      method: 'POST'
-    });
-
-    if (response.ok) {
-      console.log('POST request successful, clearing cookie and redirecting');
-      // Clear the auth_token cookie on the client side
-      document.cookie = 'auth_token=; path=/; max-age=0; secure; samesite=strict';
-
-      // Redirect to login page after logout
-      await goto('/login');
-    } else {
-      console.error('Logout failed:', response.statusText);
-    }
-  } catch (error) {
-    console.error('Error during logout:', error);
-  }
-}
-
   export let data;
-  console.log("divt",data);
+
   let activeSection = 'businessRegistration';
   let businessName = '';
   let contactAddress = '';
   let phoneNumber = '';
   let businessType = '';
-  let profileName = data.userData?.name || '';
-  let profileEmail = data.userData?.email || '';
-  let profilePaymail = data.userData?.paymailAddress || '';
+  let profileName = data?.userData?.name || '';
+  let profileEmail = data?.userData?.email || '';
+  let profilePaymail = data?.userData?.paymailAddress || '';
 
   const switchSection = (section: string) => {
     activeSection = section;
   };
+
+  async function logout() {
+    try {
+      const response = await fetch('/logout', {
+        method: 'POST'
+      });
+
+      if (response.ok) {
+        document.cookie = 'auth_token=; path=/; max-age=0; secure; samesite=strict';
+        await goto('/login');
+      } else {
+        console.error('Logout failed:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  }
 
   async function getBusinessData() {
     const response = await fetch('/dashboard');
@@ -75,31 +70,31 @@
   };
 
   const updateProfile = async () => {
-  try {
-    const response = await fetch('/dashboard', {  // Adjust this URL as needed
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: profileName,
-        email: profileEmail,
-        paymailAddress: profilePaymail,  // Changed to match server expectation
-      }),
-    });
-    
-    const result = await response.json();
-    
-    if (response.ok) {
-      alert(result.message || 'Profile updated successfully!');
-    } else {
-      alert(result.message || 'Failed to update profile.');
+    try {
+      const response = await fetch('/dashboard', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: profileName,
+          email: profileEmail,
+          paymailAddress: profilePaymail,
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        alert(result.message || 'Profile updated successfully!');
+      } else {
+        alert(result.message || 'Failed to update profile.');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('An error occurred while updating the profile.');
     }
-  } catch (error) {
-    console.error('Error updating profile:', error);
-    alert('An error occurred while updating the profile.');
-  }
-};
+  };
 </script>
 
 <div class="min-h-screen bg-gray-100 p-4">
@@ -108,12 +103,9 @@
       <!-- Header -->
       <div class="bg-gray-800 text-white p-4 flex justify-between">
         <h1 class="text-2xl">Dashboard</h1>
-        <button
-        class="text-gray-300 hover:text-white transition duration-300"
-        on:click={logout}
-      >
-        Logout
-      </button>
+        <button class="text-gray-300 hover:text-white transition duration-300" on:click={logout}>
+          Logout
+        </button>
       </div>
       
       <!-- Section Buttons -->
@@ -138,7 +130,6 @@
       <!-- Section Content -->
       <div class="p-4">
         {#if activeSection === 'businessRegistration'}
-          <!-- Business Registration Section -->
           <BusinessRegistrationSection 
             {data} 
             bind:businessName 
@@ -150,12 +141,10 @@
         {/if}
         
         {#if activeSection === 'salespersonDashboard'}
-          <!-- Salesperson Dashboard Section -->
           <SalespersonDashboardSection {data} />
         {/if}
 
         {#if activeSection === 'editProfile'}
-          <!-- Edit Profile Section -->
           <div>
             <h2 class="text-xl mb-4">Edit Profile</h2>
             <div class="mb-4">
@@ -177,9 +166,9 @@
               />
             </div>
             <div class="mb-4">
-              <label for="profileEmail" class="block text-gray-700 text-sm font-bold mb-2">Paymail</label>
+              <label for="profilePaymail" class="block text-gray-700 text-sm font-bold mb-2">Paymail</label>
               <input
-                type="paymail"
+                type="text"
                 id="profilePaymail"
                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 bind:value={profilePaymail}
@@ -198,3 +187,14 @@
 </div>
 
 <p>User data: {JSON.stringify(data.userData)}</p>
+
+<style>
+  .section-active {
+    background-color: #1d4ed8; /* Tailwind blue-700 */
+    color: white;
+  }
+  .section-inactive {
+    background-color: #e5e7eb; /* Tailwind gray-200 */
+    color: black;
+  }
+</style>

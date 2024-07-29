@@ -125,3 +125,18 @@ export async function fetchUniqueProductData(id: number) {
 
   return product;
 }
+
+export async function getPurchasesByUserId(userId: number) {
+  const purchases = await prisma.purchase.findMany({
+    where: {
+      product: {
+        userId: userId,
+      },
+    },
+    include: {
+      product: true,  // Include all product attributes
+    },
+  });
+
+  return purchases;
+}
