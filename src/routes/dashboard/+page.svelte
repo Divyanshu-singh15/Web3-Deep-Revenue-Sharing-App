@@ -121,12 +121,12 @@
         <button
           class="{activeSection === 'businessRegistration' ? 'section-active' : 'section-inactive'} px-4 py-2 rounded-md mr-2"
           on:click={() => switchSection('businessRegistration')}>
-          Business Registration
+          Business
         </button>
         <button
           class="{activeSection === 'salespersonDashboard' ? 'section-active' : 'section-inactive'} px-4 py-2 rounded-md mr-2"
           on:click={() => switchSection('salespersonDashboard')}>
-          Salesperson Dashboard
+          Salesperson
         </button>
         <button
           class="{activeSection === 'editProfile' ? 'section-active' : 'section-inactive'} px-4 py-2 rounded-md"

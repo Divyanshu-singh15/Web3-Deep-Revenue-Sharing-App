@@ -24,10 +24,15 @@ export const POST: RequestHandler = async ({ request }) => {
     if (!productData?.userId) {
       throw error(404, 'Product not found');
     }
-
     const userData = await fetchUserData(productData.userId);
-    const referData = await fetchUserData(referrerId);
-
+    let referData = null;
+    try{
+      referData = await fetchUserData(referrerId);
+    }
+    catch(e){
+      console.log("No referer found");
+    }
+    
     const referPaymail = referData?.paymailAddress || '';
     const companyAmount = productData.referalAmount 
       ? productData.price - productData.referalAmount 
