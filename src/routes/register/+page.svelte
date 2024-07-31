@@ -29,27 +29,17 @@
       errorMessage = 'Error during registration. Please try again.';
       console.error('Error during registration:', error);
     }
-  }
-</script>
 
-<div class="message-bar">SignUp</div>
-<Navbar />
+  </script>
+  
+  <div class="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto">
+    <form class="space-y-4" on:submit|preventDefault={handleSubmit}>
+      <input type="text" placeholder="Name" bind:value={username} class="border rounded-lg px-3 py-2 w-full" />
+      <input type="email" placeholder="Email" bind:value={email} class="border rounded-lg px-3 py-2 w-full" />
+      <input type="password" placeholder="Password" bind:value={password} class="border rounded-lg px-3 py-2 w-full" />
+      <button type="submit" class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-300">Register</button>
+      <p>Already have an account? <a href="/login" class="text-blue-400 hover:text-blue-600 hover:underline">Login here</a></p>
 
-<section>
-  <div class="content">
-    <h1 class="heading">Create an Account</h1>
-    <p class="sub-heading">Please fill in the details to register</p>
-    {#if errorMessage}
-      <div class="alert">
-        <span>Error</span>
-        <span>{errorMessage}</span>
-      </div>
-    {/if}
-    <form on:submit|preventDefault={handleSubmit}>
-      <input type="text" placeholder="Name" bind:value={username} required />
-      <input type="email" placeholder="Email" bind:value={email} required />
-      <input type="password" placeholder="Password" bind:value={password} required />
-      <button type="submit">Register</button>
     </form>
   </div>
 </section>

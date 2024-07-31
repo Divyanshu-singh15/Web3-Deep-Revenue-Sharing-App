@@ -1,83 +1,132 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { Chart } from 'chart.js';
 
-  export let data;
+  export let data: any;
   export let businessName: string;
   export let contactAddress: string;
   export let phoneNumber: string;
   export let businessType: string;
   export let registerBusiness: () => void;
 
-  let showPurchases = false; // State variable to toggle purchase data visibility
 
-  function togglePurchases() {
-    showPurchases = !showPurchases;
-  }
+  let currentTab = 'businesses';
 
-  let totalSelling = 0;
-  let totalPurchases = 0;
-  let averagePurchasePrice = 0;
-  let productSales = {};
-
-  // Calculate total selling amount and sales per product
-  data.purchaseData.forEach((purchase: any) => {
-    totalSelling += purchase.product.price;
-    totalPurchases += 1;
-    if (productSales[purchase.product.name]) {
-      productSales[purchase.product.name] += purchase.product.price;
-    } else {
-      productSales[purchase.product.name] = purchase.product.price;
-    }
-  });
-
-  // Calculate average purchase price
-  if (totalPurchases > 0) {
-    averagePurchasePrice = totalSelling / totalPurchases;
-  }
-
-  let chartData = {
-    labels: Object.keys(productSales),
-    datasets: [
-      {
-        label: 'Total Sales',
-        data: Object.values(productSales),
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1
-      }
-    ]
+  let statistics = {
+    totalBusinesses: data ? data.businessData.length : 0,
   };
 
-  let chart: any;
-
-  onMount(() => {
-    const ctx = document.getElementById('myChart').getContext('2d');
-    chart = new Chart(ctx, {
-      type: 'bar',
-      data: chartData,
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
-  });
-
-  $: {
-    // Update the chart if data changes
-    if (chart) {
-      chart.data = chartData;
-      chart.update();
-    }
+  function switchTab(tabName: string) {
+    currentTab = tabName;
   }
 
+  let expandedBusinessId: number | null = null;
+
+  // Aggregate data by business
+  let businessData: { [key: number]: { totalPurchases: number; totalAmountEarned: number; products: { [key: number]: { name: string; quantity: number; totalEarned: number } } } } = {};
+
+  // Process data to aggregate purchases and amount earned by business and product
+  data.purchasesData.forEach((entry: any) => {
+    const businessId = entry.product.businessId;
+    const productId = entry.product.id;
+    const price = entry.product.price;
+
+    if (!businessData[businessId]) {
+      businessData[businessId] = {
+        totalPurchases: 0,
+        totalAmountEarned: 0,
+        products: {}
+      };
+    }
+
+    businessData[businessId].totalPurchases += 1;
+    if (entry.referrerId){
+      businessData[businessId].totalAmountEarned += price - entry.product.referalAmount;
+    }
+    else{
+      businessData[businessId].totalAmountEarned += price;
+    } 
+
+    if (!businessData[businessId].products[productId]) {
+      businessData[businessId].products[productId] = {
+        name: entry.product.name,
+        quantity: 0,
+        totalEarned: 0
+      };
+    }
+
+    businessData[businessId].products[productId].quantity += 1;
+    if (entry.referrerId){
+      businessData[businessId].products[productId].totalEarned += price - entry.product.referalAmount;
+    }else{
+      businessData[businessId].products[productId].totalEarned += price;
+    }
+    
+  });
+
+  // Convert businessData object to array for easier rendering
+  let tableData = Object.entries(businessData).map(([businessId, data]) => ({
+    businessId: Number(businessId),
+    ...data
+  }));
+
+  function toggleRow(businessId: number) {
+    expandedBusinessId = expandedBusinessId === businessId ? null : businessId;
+  }
+
+  function getBusinessNameById(businessId: number) {
+  const business = data.businessData.find((b: { id: number; }) => b.id === businessId);
+  return business ? business.name : 'Business not found';
+  }
 </script>
 
-<div>
-  <div class="container mx-auto">
+<style>
+  .collapsible-content {
+    display: none;
+    margin-left: 20px;
+  }
+  .collapsible-content.show {
+    display: table-row;
+  }
+  .tab-buttons {
+    display: flex;
+    cursor: pointer;
+  }
+  .tab-button {
+    padding: 10px 20px;
+    margin-right: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  .tab-button.active {
+    background-color: #fff;
+    border-bottom: none;
+    font-weight: bold;
+  }
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: block;
+  }
+</style>
+
+<div class="container mx-auto">
+  <!-- Tab Navigation -->
+  <div class="tab-buttons">
+    <button class="tab-button {currentTab === 'businesses' ? 'active' : ''}" on:click={() => switchTab('businesses')} role="tab">
+      Your Businesses
+    </button>
+    <button class="tab-button {currentTab === 'registration' ? 'active' : ''}" on:click={() => switchTab('registration')} role="tab">
+      Business Registration
+    </button>
+    <button class="tab-button {currentTab === 'statistics' ? 'active' : ''}" on:click={() => switchTab('statistics')} role="tab">
+      Business Statistics
+    </button>
+  </div>
+
+  <!-- Your Businesses Section -->
+  <div class="tab-content {currentTab === 'businesses' ? 'active' : ''}">
+    <h2 class="text-xl font-bold mb-4">Your Businesses</h2>
     {#each data.businessData as business, index}
       <div class="flex justify-between items-center p-4 border-b border-gray-300">
         <div>
@@ -87,75 +136,86 @@
         <div>
           <a href="/dashboard/productlaunch/{business.id}" class="text-blue-500 hover:text-blue-700">
             View
-          </a>
+          </a>            
         </div>
       </div>
     {/each}
   </div>
-  
-  <div class="container mx-auto mt-8">
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" on:click={togglePurchases}>
-      {showPurchases ? 'Hide Purchases' : 'Show Purchases'}
-    </button>
 
-    {#if showPurchases}
-      <div class="mt-4">
-        <div class="chart-container">
-          <h2>Total Selling: ${totalSelling}</h2>
-          <h3>Total Purchases: ${totalPurchases}</h3>
-          <h3>Average Purchase Price: ${averagePurchasePrice.toFixed(2)}</h3>
-          <canvas id="myChart"></canvas>
-        </div>
-        
-        {#each data.purchaseData as purchase, index}
-          <div class="p-4 mb-4 bg-white shadow rounded-md">
-            <h2 class="text-lg font-semibold">{purchase.name}</h2>
-            <p class="text-gray-600">{purchase.product.description}</p>
-            <p class="text-gray-900 font-bold">${purchase.product.price.toFixed(2)}</p>
-            <a href="/product/{purchase.product.id}" class="text-blue-500 hover:text-blue-700">View</a>
-          </div>
-        {/each}
+  <!-- Business Registration Section -->
+  <div class="tab-content {currentTab === 'registration' ? 'active' : ''}">
+    <h2 class="text-xl font-bold mb-4">Business Registration</h2>
+    <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" on:submit|preventDefault={registerBusiness}>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="businessName">Business Name</label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessName" type="text" placeholder="Enter business name" bind:value={businessName} />
       </div>
-    {/if}
+      
+      <div class="mb-6">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="contactAddress">Address</label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="contactAddress" type="text" placeholder="Enter contact address" bind:value={contactAddress} />
+      </div>
+      
+      <div class="mb-6">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="contactNumber">Phone</label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="contactNumber" type="number" placeholder="Enter contact number" bind:value={phoneNumber} />
+      </div>
+      
+      <div class="mb-6">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="businessType">Business type</label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessType" type="text" placeholder="Enter business type" bind:value={businessType} />
+      </div>
+      
+      <div class="flex items-center justify-between">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Register</button>
+      </div>
+    </form>
   </div>
-  
-  <h2 class="text-xl font-bold mb-4 mt-8">Business Registration</h2>
-  
-  <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" on:submit|preventDefault={registerBusiness}>
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="businessName">Business Name</label>
-      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessName" type="text" placeholder="Enter business name" bind:value={businessName} />
+
+  <!-- Business Statistics Section -->
+  <div class="tab-content {currentTab === 'statistics' ? 'active' : ''}">
+    <h2 class="text-xl font-bold mb-4">Business Statistics</h2>
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <p class="text-gray-700 text-sm font-bold mb-2">Total Businesses: {statistics.totalBusinesses}</p>
+      <div class="container mx-auto mt-4">
+        <h2 class="text-xl font-bold mb-4">Business Summary</h2>
+        
+        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="py-2 px-4 text-left font-semibold border-b">Business Name</th>
+                <th class="py-2 px-4 text-left font-semibold border-b">Total Sold</th>
+                <th class="py-2 px-4 text-left font-semibold border-b">Total Amount Earned</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each tableData as { businessId, totalPurchases, totalAmountEarned, products }}
+                <tr class={businessId % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                  <td class="py-2 px-4 border-b cursor-pointer" on:click={() => toggleRow(businessId)}>
+                    {getBusinessNameById(businessId)}
+                  </td>
+                  <td class="py-2 px-4 border-b text-center">{totalPurchases}</td>
+                  <td class="py-2 px-4 border-b text-center">${totalAmountEarned.toFixed(2)}</td>
+                </tr>
+                {#if expandedBusinessId === businessId}
+                  {#each Object.entries(products) as [productId, product]}
+                    <tr class="collapsible-content show">
+                      <td class="py-2 px-4 pl-8 border-b" colspan="3">
+                        <div class="flex justify-between">
+                          <span>{product.name}</span>
+                          <span>Quantity: {product.quantity}</span>
+                          <span>Total Earned: ${product.totalEarned.toFixed(2)}</span>
+                        </div>
+                      </td>
+                    </tr>
+                  {/each}
+                {/if}
+              {/each}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    
-    <div class="mb-6">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="contactAddress">Address</label>
-      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="contactAddress" type="text" placeholder="Enter contact address" bind:value={contactAddress} />
-    </div>
-    
-    <div class="mb-6">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="contactNumber">Phone</label>
-      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="contactNumber" type="number" placeholder="Enter contact number" bind:value={phoneNumber} />
-    </div>
-    
-    <div class="mb-6">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="businessType">Business Type</label>
-      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="businessType" type="text" placeholder="Enter business type" bind:value={businessType} />
-    </div>
-    
-    <div class="flex items-center justify-between">
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Register</button>
-    </div>
-  </form>
+  </div>
 </div>
-
-<style>
-  .chart-container {
-    width: 80%;
-    margin: 0 auto;
-  }
-
-  canvas {
-    width: 100%;
-    height: 400px;
-  }
-</style>

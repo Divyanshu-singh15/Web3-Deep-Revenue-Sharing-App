@@ -4,6 +4,7 @@ import { PrismaClient, type Product } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function fetchUserData(userId: number) {
+  console.log("fetchUserData", userId);
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -100,6 +101,7 @@ export async function fetchAllProductsData() {
       id: true,
       name: true,
       price: true,
+      referalAmount: true,
       businessId: true,
       // Add other fields you want to return, but exclude sensitive information like passwords
     }
@@ -126,17 +128,52 @@ export async function fetchUniqueProductData(id: number) {
   return product;
 }
 
-export async function getPurchasesByUserId(userId: number) {
-  const purchases = await prisma.purchase.findMany({
-    where: {
-      product: {
-        userId: userId,
-      },
-    },
-    include: {
-      product: true,  // Include all product attributes
-    },
-  });
 
-  return purchases;
+
+
+export async function getPurchasesByUserId(userId: number) {
+  try {
+    const purchases = await prisma.purchase.findMany({
+      where: {
+        product: {
+          userId: userId,
+        },
+      },
+      include: {
+        product: true,
+      },
+    });
+    return purchases;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
 }
+
+
+export async function getReferalPurchasesByUserId(userId: number) {
+  try {
+    const purchases = await prisma.purchase.findMany({
+      where: {
+        referrerId: userId,
+      },
+      include: {
+        product: true,
+      },
+    });
+    return purchases;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+
+
+
+
+

@@ -65,6 +65,7 @@
       >
         Login
       </button>
+      <p>Don't have an account? <a href="/register" class="text-blue-400 hover:text-blue-500 hover:underline">Sign up here</a></p>
     </form>
     <div class="register-link" on:click={() => goto('/register')}>
       Don't have an account? Register here.
