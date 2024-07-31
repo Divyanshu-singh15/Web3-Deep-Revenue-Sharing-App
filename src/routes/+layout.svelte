@@ -5,13 +5,11 @@
 
   async function logout() {
   try {
-    console.log('Sending POST request to /logout');
     const response = await fetch('/logout', {
       method: 'POST'
     });
 
     if (response.ok) {
-      console.log('POST request successful, clearing cookie and redirecting');
       // Clear the auth_token cookie on the client side
       document.cookie = 'auth_token=; path=/; max-age=0; secure; samesite=strict';
 

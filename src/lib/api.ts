@@ -4,7 +4,6 @@ import { PrismaClient, type Product } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function fetchUserData(userId: number) {
-  console.log("fetchUserData", userId);
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
