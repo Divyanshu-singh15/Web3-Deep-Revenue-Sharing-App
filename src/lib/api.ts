@@ -130,6 +130,7 @@ export async function fetchUniqueProductData(id: number) {
 
 
 
+
 export async function getPurchasesByUserId(userId: number) {
   try {
     const purchases = await prisma.purchase.findMany({

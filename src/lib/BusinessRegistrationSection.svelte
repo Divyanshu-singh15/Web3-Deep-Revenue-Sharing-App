@@ -1,10 +1,12 @@
 <script lang="ts">
+
   export let data: any;
   export let businessName: string;
   export let contactAddress: string;
   export let phoneNumber: string;
   export let businessType: string;
   export let registerBusiness: () => void;
+
 
   let currentTab = 'businesses';
 
