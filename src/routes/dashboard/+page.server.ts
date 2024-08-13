@@ -1,7 +1,11 @@
 // src/routes/dashboard/+page.server.ts
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
-import { fetchUserData, fetchBusinessData, fetchAllBusinessData, fetchAllProductsData, getPurchasesByUserId, getReferalPurchasesByUserId } from '$lib/api'; // Implement this function to fetch user data
+import { fetchUserData, fetchBusinessData,
+  fetchAllBusinessData, fetchAllProductsData,
+  getPurchasesByUserId, getReferalPurchasesByUserId,
+  fetchAllSalespersonBusinessData, fetchUserEarning
+ } from '$lib/api'; // Implement this function to fetch user data
 
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -17,6 +21,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   const allBusinessData = await fetchAllBusinessData()
 
+  const salespersoncompanies = await fetchAllSalespersonBusinessData(locals.user.userId)
+
   const allProductsData = await fetchAllProductsData()
 
   //this is being used to fetch all the sells of businesses of a user
@@ -25,12 +31,19 @@ export const load: PageServerLoad = async ({ locals }) => {
   //this is being used to fetch all the referl sells made by the user
   const referalPurchaseData = await getReferalPurchasesByUserId(locals.user.userId)
 
+  const userEarnings = await fetchUserEarning(locals.user.userId)
+
+  console.log("userEarnings", userEarnings);
+
   return {
     userData,
     businessData,
     allBusinessData,
     allProductsData,
     purchasesData,
-    referalPurchaseData
+    referalPurchaseData,
+    salespersoncompanies,
+    userEarnings
   };
 };
+

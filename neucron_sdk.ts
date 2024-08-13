@@ -1,19 +1,22 @@
 // @ts-nocheck
 import NeucronSDK from "neucron-sdk";
 
-async function makePayment(email, password, companyUserAddress, compnayAmount, companyNote, referalnote, referalAddress, referalamount ) {
+async function makePayment(email, password, paymentOptions) {
   try {
     const neucron = new NeucronSDK();
     const authModule = neucron.authentication;
     const walletModule = neucron.wallet;
 
     // Login with provided credentials
+    console.log("loginwell", email, password);
     await authModule.login({ email, password });
+    console.log("loginwellloggedin");
 
     // Get wallet keys and balance (optional, for verification)
     const walletKeys = await walletModule.getWalletKeys({});
     const defaultWalletBalance = await walletModule.getWalletBalance({});
-    let options = {};
+  
+    // let options = {};
     // const options = {outputs: [
     //   {
     //     address: companyUserAddress,
@@ -22,32 +25,9 @@ async function makePayment(email, password, companyUserAddress, compnayAmount, c
     //   }]};
     // Prepare payment options
 
-    if (referalAddress===''){
-      options = {
-        outputs: [
-          {
-            address: companyUserAddress,
-            note: companyNote,
-            amount: compnayAmount
-          }]
-    }}
-    else {
-     options = {
-        outputs: [
-          {
-            address: companyUserAddress,
-            note: companyNote,
-            amount: compnayAmount
-          },{
-            address: referalAddress,
-            note: referalnote,
-            amount: referalamount
-          }
-        ]
-      };
-    }
+    let options = {outputs: paymentOptions};
     
-
+    console.log("bing", email, password, options);
     // Make the payment
     const payResponse = await neucron.pay.txSpend(options);
     

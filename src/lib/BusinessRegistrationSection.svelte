@@ -5,7 +5,7 @@
   export let phoneNumber: string;
   export let businessType: string;
   export let registerBusiness: () => void;
-
+  {console.log("welp",data.businessData)}
   let currentTab = 'businesses';
 
   let statistics = {
@@ -37,7 +37,7 @@
 
     businessData[businessId].totalPurchases += 1;
     if (entry.referrerId){
-      businessData[businessId].totalAmountEarned += price - entry.product.referalAmount;
+      businessData[businessId].totalAmountEarned += price - entry.product.referalPercent;
     }
     else{
       businessData[businessId].totalAmountEarned += price;
@@ -53,7 +53,7 @@
 
     businessData[businessId].products[productId].quantity += 1;
     if (entry.referrerId){
-      businessData[businessId].products[productId].totalEarned += price - entry.product.referalAmount;
+      businessData[businessId].products[productId].totalEarned += price - entry.product.referalPercent;
     }else{
       businessData[businessId].products[productId].totalEarned += price;
     }
@@ -74,6 +74,17 @@
   const business = data.businessData.find((b: { id: number; }) => b.id === businessId);
   return business ? business.name : 'Business not found';
   }
+
+
+  const copyLink = (inviteCode: any) => {
+    console.log('Copying link to clipboard:', inviteCode[0].inviteCode);
+    const link = `${inviteCode[0].inviteCode}`;
+    navigator.clipboard.writeText(link).then(() => {
+      alert('Link copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  };
 </script>
 
 <style>
@@ -125,24 +136,58 @@
   <!-- Your Businesses Section -->
   <div class="tab-content {currentTab === 'businesses' ? 'active' : ''}">
     <h2 class="text-xl font-bold mb-4">Your Businesses</h2>
-    {#each data.businessData as business, index}
-      <div class="flex justify-between items-center p-4 border-b border-gray-300">
-        <div>
-          <span class="font-bold">{business.name}</span>
-          <span class="text-gray-500 ml-2">{business.type}</span>
-        </div>
-        <div>
-          <a href="/dashboard/productlaunch/{business.id}" class="text-blue-500 hover:text-blue-700">
-            View
-          </a>            
-        </div>
-      </div>
-    {/each}
-  </div>
+    
+    <table class="min-w-full bg-white border border-gray-300">
+        <thead>
+            <tr class="w-full bg-gray-100 border-b border-gray-300">
+                <th class="p-4 text-left">Name</th>
+                <th class="p-4 text-left">Type</th>
+                <th class="p-4 text-left">Address</th>
+                <th class="p-4 text-left">Phone</th>
+                <th class="p-4 text-left">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {#each data.businessData as business}
+                <tr class="border-b border-gray-300">
+                    <td class="p-4">{business.name}</td>
+                    <td class="p-4">{business.type}</td>
+                    <td class="p-4">{business.address}</td>
+                    <td class="p-4">{business.phone}</td>
+                    <td class="p-4 flex space-x-2">
+                        <button 
+                            on:click={() => copyLink(business.invitingCode)}
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Copy Invite Link
+                        </button>
+                        <a 
+                            href="/dashboard/productlaunch/{business.id}"
+                            class="text-blue-500 hover:text-blue-700"
+                        >
+                        <button
+                        class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+
+                        >
+
+                          View Products
+                        </button>
+                            
+                        </a>
+                    </td>
+                </tr>
+            {/each}
+        </tbody>
+    </table>
+</div>
+
 
   <!-- Business Registration Section -->
   <div class="tab-content {currentTab === 'registration' ? 'active' : ''}">
     <h2 class="text-xl font-bold mb-4">Business Registration</h2>
+    {#if data.userData?.paymailAddress === null}
+          <p class="p-4 text-red-500">Kindly set your paymail Id in your profile first so that you receive the payment</p>
+    {/if}
     <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" on:submit|preventDefault={registerBusiness}>
       <div class="mb-4">
         <label class="block text-gray-700 text-sm font-bold mb-2" for="businessName">Business Name</label>

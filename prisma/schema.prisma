@@ -22,7 +22,13 @@ model User {
   paymailAddress String?
   businesses Business[] // One-to-many relationship with Business
   product Product[]
+  salespersons        SalespersonCompany[] @relation("UserSalesperson")
+  invitedSalespersons SalespersonCompany[] @relation("InviterSalesperson")
+  invitingCode InvitingCode[]
+  Earnings Earnings[]
 }
+
+
 
 
 model Business {
@@ -34,7 +40,40 @@ model Business {
   userId  Int     // Foreign key to User
   user    User    @relation(fields: [userId], references: [id])
   product Product[]
+  salespersonCompany SalespersonCompany[]
+  invitingCode InvitingCode[]
 }
+
+model InvitingCode {
+  id      Int     @id @default(autoincrement())
+  userId  Int     // Foreign key to User
+  user    User    @relation(fields: [userId], references: [id])
+  businessId Int
+  business Business @relation(fields: [businessId], references: [id])
+  inviteCode    String  @unique
+  isCompany Boolean @default(false)
+  salespersonCompany SalespersonCompany[]
+  @@index([userId])
+  @@index([businessId])
+}
+
+
+model SalespersonCompany {
+  id         Int      @id @default(autoincrement())
+  userId     Int      // Foreign key to User
+  user       User     @relation("UserSalesperson", fields: [userId], references: [id])
+  businessId Int      // Foreign key to Business 
+  business   Business @relation(fields: [businessId], references: [id])
+  inviterId  Int?     // Foreign key to User as Inviter
+  inviter    User?    @relation("InviterSalesperson", fields: [inviterId], references: [id])
+  invitingCode InvitingCode? @relation(fields: [invitingCodeId], references: [id])
+  invitingCodeId Int?        // Foreign key to InvitingCode
+  
+  @@index([userId])
+  @@index([businessId])
+  @@index([inviterId])
+}
+
 
 
 model Product {
@@ -42,13 +81,14 @@ model Product {
   name    String
   description String
   price   Int
-  referalAmount Int?
+  referalPercent Int?
   businessId    Int
   business Business @relation(fields: [businessId], references: [id])
   userId  Int     // Foreign key to User
   user    User    @relation(fields: [userId], references: [id])
   purchases Purchase[]
 }
+
 
 model Purchase {
   id      Int     @id @default(autoincrement())
@@ -58,6 +98,15 @@ model Purchase {
   productId Int
   referrerId Int?
   product Product @relation(fields: [productId], references: [id])
+  Earnings Earnings[]
 }
 
-
+model Earnings {
+  id           Int      @id @default(autoincrement())
+  purchaseId   Int      // Foreign key to Purchase
+  purchase     Purchase @relation(fields: [purchaseId], references: [id])
+  userId       Int      // Foreign key to User who earned this amount
+  user         User     @relation(fields: [userId], references: [id])
+  amountEarned Int    // Amount earned by the user for this purchase
+  createdAt    DateTime @default(now())
+}

@@ -5,7 +5,34 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
 import { PrismaClient } from '@prisma/client';
 
+import { v4 as uuidv4 } from 'uuid';
+
+
 const prisma = new PrismaClient();
+
+
+async function generateUniqueInviteCode() {
+  let inviteCode: string = '';
+  let isUnique = false;
+
+  while (!isUnique) {
+    inviteCode = uuidv4(); // Generate a new invite code
+    try {
+      // Check if the invite code already exists in the database
+      const existingCode = await prisma.invitingCode.findUnique({
+        where: { inviteCode: inviteCode },
+      });
+
+      if (!existingCode) {
+        isUnique = true; // Invite code is unique
+      }
+    } catch (error) {
+      throw error; // Rethrow if there's an unexpected error
+    }
+  }
+
+  return inviteCode;
+}
 
 export const GET: RequestHandler = async ({ locals }) => {
   try {
@@ -37,24 +64,42 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 
 
+
+
 export async function POST({ request }: RequestEvent) {
   try {
     const { businessName, businessType, phoneNumber, contactAddress, userId } = await request.json();
+
+    // Validate input
     if (!businessName || !businessType || !phoneNumber || !contactAddress || !userId) {
       return json({ error: 'All fields are required' }, { status: 400 });
     }
 
+    // Generate a unique invite code
+    const inviteCode = await generateUniqueInviteCode();
+
+    // Use a transaction to ensure atomicity
     const business = await prisma.business.create({
       data: {
         name: businessName,
-        address: contactAddress, 
-        phone: phoneNumber.toString(),   
-        type: businessType,    
+        address: contactAddress,
+        phone: phoneNumber.toString(),
+        type: businessType,
         userId: userId,
-      }
+      },
     });
 
-    return json({ business }, { status: 201 });
+    // Create the inviting code with the actual businessId
+    const invitingCode = await prisma.invitingCode.create({
+      data: {
+        userId: userId,
+        businessId: business.id, // Use the actual business ID
+        inviteCode: inviteCode,
+        isCompany: true,
+      },
+    });
+
+    return json({ business, invitingCode }, { status: 201 });
   } catch (error) {
     console.error('Business registration error:', error);
     return json({ error: 'Failed to register business' }, { status: 500 });
